@@ -1,5 +1,4 @@
 from pathlib import Path
-import json
 
 from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -13,33 +12,22 @@ from src.visualization import (
     generate_credits_plot, 
     generate_term_specific_plot, 
 )
-
-# ==========================================
-# 1. SETUP & INITIALIZATION
-# ==========================================
 app = FastAPI(title="Hungarian University GPA API", description="API and Dashboard for managing courses and calculating GPA.")
 
 BASE_DIR = Path(__file__).resolve().parent
 TEMPLATE_DIR = BASE_DIR.parent / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
-# Initialize the storage manager and load existing data
 my_courses = Courses()
 storage = CourseStorage()
 
-# Load the dictionary of courses from storage, and attach it to the Courses object
 my_courses.courses = storage.load()
 
-# Pydantic Model for API Input Validation
 class CourseInput(BaseModel):
     course_name: str
     credit: int
     score: int
     term_id: int
-
-# ==========================================
-# 2. DASHBOARD ROUTES (HTML & Forms)
-# ==========================================
 
 @app.get("/dashboard", response_class=HTMLResponse, tags=["Dashboard"])
 def view_dashboard(request: Request):
@@ -72,9 +60,7 @@ async def add_course(raw_input: str = Form(...)):
         new_course = Course(name, credit, score, term)
         my_courses.addCourse(new_course)
         
-        # 1. Save to disk
         storage.save(my_courses.courses)
-        # 2. Reload into memory immediately to ensure synchronization
         my_courses.courses = storage.load()
             
     except Exception as e:
@@ -88,9 +74,7 @@ async def delete_course(course_name: str):
     if course_name in my_courses.courses:
         my_courses.removeCourse(course_name)
         
-        # 1. Save to disk
         storage.save(my_courses.courses)
-        # 2. Reload into memory immediately
         my_courses.courses = storage.load()
             
     return RedirectResponse(url="/dashboard", status_code=303)
@@ -112,25 +96,19 @@ async def edit_course(
 
 @app.post("/edit/{course_name}")
 async def edit_course(course_name: str, new_credit: int, new_score: int, new_term: int):
-    courses_dict = storage.load() # Load existing state
+    courses_dict = storage.load() 
     
     if course_name in courses_dict:
         course = courses_dict[course_name]
         
-        # Use the validation methods you wrote in classes.py
         course.changeTerm(new_term)
         course.changeCredit(new_credit)
         course.changeScore(new_score)
         
-        # Persist the change
         storage.save(courses_dict)
         return {"status": "success"}
     
     return {"status": "error", "message": "Course not found"}
-
-# ==========================================
-# 3. RAW API ENDPOINTS (JSON)
-# ==========================================
 
 @app.get("/", tags=["General"])
 def read_root():
@@ -177,10 +155,6 @@ def get_term_gpa(term_id: int):
         "term_id": term_id, 
         "term_gpa": round(my_courses.calculateGPAByTerm(term_id), 2)
     }
-
-# ==========================================
-# 4. VISUALIZATION ENDPOINTS (IFRAMES)
-# ==========================================
 
 @app.get("/visualize/gpa", response_class=HTMLResponse, tags=["Visualizations"])
 def visualize_gpa_by_term():

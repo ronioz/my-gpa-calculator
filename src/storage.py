@@ -7,7 +7,6 @@ class CourseStorage:
         self.filename = filename
 
     def save(self, courses_dict: dict) -> None:
-        # Convert Course objects to dictionaries for JSON serialization
         serializable = {
             name: course.to_dict() 
             for name, course in courses_dict.items()
@@ -26,7 +25,6 @@ class CourseStorage:
             except json.JSONDecodeError:
                 return {}
         
-        # Convert dictionaries back into Course objects
         courses = {}
         for name, course_data in data.items():
             courses[name] = Course.from_dict(course_data)

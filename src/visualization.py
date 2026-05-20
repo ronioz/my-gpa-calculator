@@ -1,144 +1,79 @@
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.io as pio
 from src.classes import Courses
 
-THEME_COLOR = '#0dcaf0' 
+MONO_COLORS = ['#404040', '#555555', '#707070', '#888888', '#A0A0A0', '#C0C0C0']
+pio.templates.default = "plotly_dark"
+pio.templates["mono_theme"] = pio.templates["plotly_dark"]
+pio.templates["mono_theme"].layout.colorway = MONO_COLORS
 
 def generate_gpa_plot(my_courses: Courses) -> str:
-    """Generates a combo chart showing Term GPA (bars) and Cumulative GPA (line)."""
+    """Generates a combo chart using shades of gray."""
     terms = sorted(list(set(int(course.termID) for course in my_courses.courses.values())))
     if not terms:
         return "<h3>No course data available to visualize.</h3>"
 
-    x_vals = []
-    term_gpas = []
-    cumulative_gpas = []
-
-    # Calculate both micro and macro stats for each term
+    x_vals, term_gpas, cumulative_gpas = [], [], []
     for term in terms:
         x_vals.append(f"Term {term}")
-        
-        # 1. Term Specific GPA
-        term_gpa = my_courses.calculateGPAByTerm(term)
-        term_gpas.append(round(term_gpa, 2))
-        
-        # 2. Cumulative GPA up to this term
+        term_gpas.append(round(my_courses.calculateGPAByTerm(term), 2))
         c_score = sum(c.score * c.credit for c in my_courses.courses.values() if int(c.termID) <= term)
         c_credit = sum(c.credit for c in my_courses.courses.values() if int(c.termID) <= term)
-        cum_gpa = c_score / c_credit if c_credit > 0 else 0.0
-        cumulative_gpas.append(round(cum_gpa, 2))
+        cumulative_gpas.append(round(c_score / c_credit if c_credit > 0 else 0.0, 2))
 
-    # Build the combo chart layer by layer
     fig = go.Figure()
+    fig.add_trace(go.Bar(x=x_vals, y=term_gpas, name="Term GPA", marker_color='#404040', text=term_gpas, textposition='auto'))
+    fig.add_trace(go.Scatter(x=x_vals, y=cumulative_gpas, name="Cumulative Trend", mode='lines+markers', 
+                             marker=dict(color='#A0A0A0', size=10), line=dict(color='#A0A0A0', width=3)))
 
-    # Layer 1: The Bars (Term Performance)
-    fig.add_trace(go.Bar(
-        x=x_vals,
-        y=term_gpas,
-        name="Term GPA",
-        marker_color='#3d8bfd', # Deep blue from our palette
-        text=term_gpas,
-        textposition='inside',
-        insidetextanchor='middle'
-    ))
-
-    # Layer 2: The Line (Cumulative Trend)
-    fig.add_trace(go.Scatter(
-        x=x_vals,
-        y=cumulative_gpas,
-        name="Cumulative Trend",
-        mode='lines+markers+text',
-        marker=dict(color='#0dcaf0', size=12), # Glowing cyan
-        line=dict(color='#0dcaf0', width=4),
-        text=cumulative_gpas,
-        textposition='top center',
-        textfont=dict(size=14, color='white')
-    ))
-
-    # Polish the dark mode layout
-    fig.update_layout(
-        template='plotly_dark',
-        title="Performance Analytics: Term vs. Cumulative",
-        xaxis_title="Academic Term",
-        yaxis_title="Weighted Grade (1-5)",
-        yaxis=dict(range=[0, 5.8]), # Extra headroom for the top labels
-        legend=dict(
-            orientation="h", # Horizontal legend
-            yanchor="bottom", 
-            y=1.02, 
-            xanchor="right", 
-            x=1
-        ),
-        margin=dict(t=60, l=10, r=10, b=10)
-    )
-
-    return fig.to_html(full_html=False, include_plotlyjs='cdn')
+    fig.update_layout(template='mono_theme', title="Performance Analytics: Term vs. Cumulative", 
+                      yaxis=dict(range=[0, 5.5], gridcolor='#262626'), xaxis=dict(gridcolor='#262626'))
+    html_content = fig.to_html(full_html=False, include_plotlyjs='cdn')
+    
+    css_injection = """
+    <style>
+        body { background: transparent !important; margin: 0 !important; padding: 0 !important; }
+        .plotly-graph-div { background: transparent !important; }
+    </style>
+    """
+    return css_injection + html_content
 
 def generate_credits_plot(my_courses: Courses) -> str:
-    """Generates a hierarchical treemap of credits per course grouped by term."""
-    if not my_courses.courses:
-        return "<h3>No course data available to visualize.</h3>"
-        
-    data = []
-    for c in my_courses.courses.values():
-        data.append({
-            "Term": f"Term {c.termID}",
-            "Course": c.courseName,
-            "Credits": c.credit
-        })
-
-    # A custom palette of cool, blueish tones that pop in dark mode
-    blueish_palette = ['#0dcaf0', '#0d6efd', '#6ea8fe', '#9ec5fe', '#3d8bfd']
-
-    fig = px.treemap(
-        data, 
-        path=["Term", "Course"],  
-        values="Credits",         
-        color="Term",             
-        color_discrete_sequence=blueish_palette,  # Force Plotly to use our blues!
-        title="Credit Distribution per Term"
-    )
+    """Generates a treemap using grayscale tones."""
+    if not my_courses.courses: return "<h3>No data available.</h3>"
     
-    fig.update_layout(
-        template='plotly_dark',
-        margin=dict(t=40, l=10, r=10, b=10) 
-    )
+    data = [{"Term": f"Term {c.termID}", "Course": c.courseName, "Credits": c.credit} for c in my_courses.courses.values()]
+    fig = px.treemap(data, path=["Term", "Course"], values="Credits", color="Term", 
+                     color_discrete_sequence=MONO_COLORS, title="Credit Distribution per Term")
     
-    fig.update_traces(
-        textinfo="label+value", 
-        textfont=dict(size=14)
-    )
+    fig.update_layout(template='mono_theme', margin=dict(t=40, l=10, r=10, b=10))
+    html_content = fig.to_html(full_html=False, include_plotlyjs='cdn')
     
-    return fig.to_html(full_html=False, include_plotlyjs='cdn')
+    css_injection = """
+    <style>
+        body { background: transparent !important; margin: 0 !important; padding: 0 !important; }
+        .plotly-graph-div { background: transparent !important; }
+    </style>
+    """
+    return css_injection + html_content
 
 def generate_term_specific_plot(my_courses: Courses, term_id: int) -> str:
-    """Generates a bar chart showing scores for courses in a specific term."""
+    """Generates a grayscale bar chart for a specific term."""
     courses_in_term = [c for c in my_courses.courses.values() if c.termID == term_id]
-    
-    if not courses_in_term:
-        return f"<h3>No course data available for Term {term_id}.</h3>"
+    if not courses_in_term: return f"<h3>No data for Term {term_id}.</h3>"
 
-    x_vals = [c.courseName for c in courses_in_term]
-    y_vals = [c.score for c in courses_in_term]
-
-    fig = px.bar(
-        x=x_vals,
-        y=y_vals,
-        title=f"Course Grades for Term {term_id}",
-        text=y_vals
-    )
+    fig = px.bar(x=[c.courseName for c in courses_in_term], y=[c.score for c in courses_in_term],
+                 title=f"Course Grades for Term {term_id}", text=[c.score for c in courses_in_term])
     
-    fig.update_traces(
-        textposition='outside',
-        marker_color=THEME_COLOR
-    )
+    fig.update_traces(marker_color='#606060', textposition='outside')
+    fig.update_layout(template='mono_theme', yaxis=dict(range=[0, 5.5], gridcolor='#262626'), xaxis=dict(gridcolor='#262626'))
+    html_content = fig.to_html(full_html=False, include_plotlyjs='cdn')
     
-    fig.update_layout(
-        template='plotly_dark',
-        xaxis_title="Course",
-        yaxis_title="Grade (1-5)",
-        yaxis_range=[0, 5.5], 
-        xaxis_tickangle=-45
-    )
-    
-    return fig.to_html(full_html=False, include_plotlyjs='cdn')
+    css_injection = """
+    <style>
+        body { background: transparent !important; margin: 0 !important; padding: 0 !important; }
+        .plotly-graph-div { background: transparent !important; }
+    </style>
+    """
+    return css_injection + html_content

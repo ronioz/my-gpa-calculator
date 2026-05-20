@@ -2,81 +2,94 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <style>
-        .flip-card { background-color: transparent; width: 100%; height: 120px; perspective: 1000px; }
+        :root {
+            --bg-deep: #000000;      /* Pure black */
+            --bg-card: #121212;      /* Near-black card */
+            --bg-surface: #1e1e1e;   /* Slightly lighter gray surface */
+            --text-main: #e0e0e0;    /* Soft gray */
+            --text-dim: #a0a0a0;     /* Dim gray */
+            --accent: #404040;       /* Border/Separator gray */
+        }
+        body { background-color: var(--bg-deep) !important; color: var(--text-main) !important; font-family: 'Inter', sans-serif; }
+        .card { background-color: var(--bg-card) !important; border: 1px solid var(--accent) !important; }
+        .list-group-item { background-color: var(--bg-card) !important; border-color: var(--accent) !important; color: var(--text-main) !important; }
+        .btn-success { background-color: #262626 !important; border: 1px solid #404040 !important; }
+        .btn-primary { background-color: #333333 !important; border: none; color: white !important; }
+        .btn-outline-info { color: #888 !important; border-color: #404040 !important; }
+        .btn-outline-info:hover { background-color: #262626 !important; color: #fff !important; }
+        
+        /* Fixed Flip Card Logic */
+        .flip-card { background-color: transparent; width: 100%; height: 120px; perspective: 1000px; cursor: pointer; }
         .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
         .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
-        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 8px; }
-        .flip-card-back { transform: rotateY(180deg); background-color: #0da5fd; }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 8px; border: 1px solid var(--accent); }
+        .flip-card-front { background-color: var(--bg-card); }
+        .flip-card-back { transform: rotateY(180deg); background-color: #262626; }
+        iframe { background-color: transparent !important; border: none !important; }
     </style>
     <meta charset="UTF-8">
-    <title>Hungarian University GPA Dashboard</title>
+    <title>Hungarian University GPA Portal</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
-<body class="bg-dark text-light">
+<body>
 
 <div class="container my-5">
-    <h1 class="mb-4 text-center">🇭🇺 Hungarian University GPA Portal</h1>
+    <h1 class="mb-4 text-center fw-bold" style="color: #ffffff;">🇭🇺 Hungarian University GPA Portal</h1>
 
     <div class="row text-center mb-4">
         <div class="col-md-4">
             <div class="flip-card">
                 <div class="flip-card-inner">
-                    <div class="flip-card-front bg-primary text-white shadow-sm">
-                        <h6>Cumulative GPA</h6>
-                        <h2>{{ cumulative_gpa }}</h2>
+                    <div class="flip-card-front">
+                        <h6 class="text-dim">Cumulative GPA</h6>
+                        <h2 style="color: #ffffff;">{{ cumulative_gpa }}</h2>
                     </div>
-                    <div class="flip-card-back text-white shadow-sm">
-                        <h6>GPA (4.0 Scale)</h6>
-                        <h2>{{ (cumulative_gpa | float * 4 / 5) | round(2) }}</h2>
+                    <div class="flip-card-back">
+                        <h6 class="text-dim">GPA (4.0 Scale)</h6>
+                        <h2 style="color: #ffffff;">{{ (cumulative_gpa | float * 4 / 5) | round(2) }}</h2>
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card p-3 shadow-sm bg-dark text-white border-secondary">
-                <h6>Total ECTS Credits</h6>
-                <h2>{{ total_credits }}</h2>
+            <div class="card p-3 h-100">
+                <h6 class="text-dim">Total ECTS Credits</h6>
+                <h2 style="color: #ffffff;">{{ total_credits }}</h2>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card p-3 shadow-sm bg-secondary text-white border-0">
-                <h6>Total Weighted Score</h6>
-                <h2>{{ total_score }}</h2>
+            <div class="card p-3 h-100">
+                <h6 class="text-dim">Total Weighted Score</h6>
+                <h2 style="color: #ffffff;">{{ total_score }}</h2>
             </div>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-5">
-            <div class="card p-4 shadow-sm mb-4">
-                <h5>Add New Course</h5>
+            <div class="card p-4 mb-4">
+                <h5 class="mb-3" style="color: #ffffff;">Add New Course</h5>
                 <form action="/add-course" method="POST">
-                    <div class="mb-3">
-                        <input type="text" name="raw_input" class="form-control" placeholder="e.g. Calculus 5 4 1" required>
-                    </div>
-                    <button type="submit" class="btn btn-success w-100 fw-bold">Submit to System</button>
+                    <input type="text" name="raw_input" class="form-control mb-3" placeholder="e.g. Calculus 5 4 1" style="background: #000; border-color: #404040; color: #fff;" required>
+                    <button type="submit" class="btn btn-success w-100">Submit</button>
                 </form>
             </div>
 
-            <div class="card p-4 shadow-sm" style="max-height: 400px; overflow-y: auto;">
-                <h5>Course History Record</h5>
-                <ul class="list-group mt-2">
+            <div class="card p-4" style="max-height: 400px; overflow-y: auto;">
+                <h5 class="mb-3" style="color: #ffffff;">Course History</h5>
+                <ul class="list-group">
                     {% for course in courses %}
-                    <li class="list-group-item d-flex flex-column gap-2">
-                        <div class="d-flex justify-content-between align-items-center w-100">
-                            <div>
-                                <strong>{{ course.courseName }}</strong>
-                                <div class="text-muted small">Term: {{ course.termID }}</div>
-                            </div>
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <strong style="color: #ffffff;">{{ course.courseName }}</strong>
                             <form action="/delete-course/{{ course.courseName }}" method="post" class="m-0">
-                                <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                                <button type="submit" class="btn btn-sm" style="color: #555;">&times;</button>
                             </form>
                         </div>
-                        
-                        <form action="/edit-course" method="post" class="d-flex gap-1 align-items-center">
+                        <form action="/edit-course" method="post" class="d-flex gap-2">
                             <input type="hidden" name="course_name" value="{{ course.courseName }}">
-                            <input type="number" name="new_credit" class="form-control form-control-sm" style="width: 60px;" value="{{ course.credit }}" placeholder="Cr" required>
-                            <input type="number" name="new_score" class="form-control form-control-sm" style="width: 60px;" value="{{ course.score }}" placeholder="Gr" required>
+                            <input type="number" name="new_credit" class="form-control form-control-sm" value="{{ course.credit }}" style="width: 60px; background: #000; border-color: #404040; color: #fff;">
+                            <input type="number" name="new_score" class="form-control form-control-sm" value="{{ course.score }}" style="width: 60px; background: #000; border-color: #404040; color: #fff;">
                             <button type="submit" class="btn btn-sm btn-primary">Save</button>
                         </form>
                     </li>
@@ -86,14 +99,27 @@
         </div>
 
         <div class="col-md-7">
-            <div class="card p-4 shadow-sm h-100 border-0">
-                <h5 class="mb-3">Visual Performance Analytics</h5>
-                <iframe name="vizFrame" src="/visualize/gpa" width="100%" height="450px" style="border:none; border-radius: 8px;"></iframe>
+            <div class="card p-4 h-100">
+                <h5 class="mb-3" style="color: #ffffff;">Visual Performance</h5>
+                <div class="btn-group mb-3">
+                    <a href="/visualize/gpa" target="vizFrame" class="btn btn-sm btn-outline-info">GPA Trend</a>
+                    <a href="/visualize/credits" target="vizFrame" class="btn btn-sm btn-outline-info">Credit Treemap</a>
+                        <a href="/visualize/term/1" target="vizFrame" class="btn btn-sm btn-outline-info">📝 Term 1 Details</a>
+                        <a href="/visualize/term/2" target="vizFrame" class="btn btn-sm btn-outline-info">📝 Term 2 Details</a>
+                </div>
+                <iframe 
+                    name="vizFrame" 
+                    src="/visualize/gpa" 
+                    width="100%" 
+                    height="400px" 
+                    style="border:none; margin: 0; padding: 0; background-color: transparent;"
+                    scrolling="no">
+                </iframe>
             </div>
         </div>
     </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 </body>
 </html>
