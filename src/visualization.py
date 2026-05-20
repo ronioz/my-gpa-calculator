@@ -1,6 +1,6 @@
 import plotly.express as px
 import plotly.graph_objects as go
-from classes import Courses
+from src.classes import Courses
 
 THEME_COLOR = '#0dcaf0' 
 

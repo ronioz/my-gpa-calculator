@@ -1,5 +1,5 @@
 import sqlite3
-from classes import Course, Courses
+from src.classes import Course, Courses
 
 class CourseStorage:
     def __init__(self, filename: str = "courses.db") -> None:

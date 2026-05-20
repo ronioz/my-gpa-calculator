@@ -6,9 +6,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from classes import Course, Courses
-from storage import CourseStorage
-from visualization import (
+from src.classes import Course, Courses
+from src.storage import CourseStorage
+from src.visualization import (
     generate_gpa_plot, 
     generate_credits_plot, 
     generate_term_specific_plot, 
@@ -93,6 +93,24 @@ async def delete_course(course_name: str):
         my_courses.courses = storage.load()
             
     return RedirectResponse(url="/dashboard", status_code=303)
+
+@app.post("/edit/{course_name}")
+async def edit_course(course_name: str, new_credit: int, new_score: int, new_term: int):
+    courses_dict = storage.load() # Load existing state
+    
+    if course_name in courses_dict:
+        course = courses_dict[course_name]
+        
+        # Use the validation methods you wrote in classes.py
+        course.changeTerm(new_term)
+        course.changeCredit(new_credit)
+        course.changeScore(new_score)
+        
+        # Persist the change
+        storage.save(courses_dict)
+        return {"status": "success"}
+    
+    return {"status": "error", "message": "Course not found"}
 
 # ==========================================
 # 3. RAW API ENDPOINTS (JSON)

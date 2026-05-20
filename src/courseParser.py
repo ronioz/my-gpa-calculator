@@ -1,4 +1,4 @@
-from classes import Course
+from src.classes import Course
 
 class CourseParser:
     @staticmethod

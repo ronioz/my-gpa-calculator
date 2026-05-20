@@ -5,17 +5,33 @@ class Course:
         self.score = score 
         self.termID = termID 
 
-    def changeScore(self, newScore: int) -> None:
-        if newScore < 1 or newScore > 5:
-            print("Enter valid score (1-5)")
-            return 
-        self.score = newScore 
+    def changeCourseName(self, newName: str) -> None:
+        if newName is None:
+            print("Enter name")
+            return
+
+        self.courseName = newName 
 
     def changeCredit(self, newCredit: int) -> None:
         if newCredit <= 0:
             print("Enter valid credit")
             return
+        
         self.credit = newCredit
+
+    def changeScore(self, newScore: int) -> None:
+        if newScore < 1 or newScore > 5:
+            print("Enter valid score (1-5)")
+            return
+         
+        self.score = newScore
+
+    def changeTerm(self, newTerm: int) -> None:
+        if not 1<= newTerm <= 6:
+            print("Enter valid term")
+            return
+        
+        self.termID = newTerm
 
     def __str__(self) -> str:
         return f"Name: {self.courseName}, credit: {self.credit}, score: {self.score}, term: {self.termID}"
