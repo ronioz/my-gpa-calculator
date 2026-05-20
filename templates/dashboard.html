@@ -2,37 +2,11 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <style>
-        .flip-card {
-            background-color: transparent;
-            width: 100%;
-            height: 120px;
-            perspective: 1000px;
-        }
-        .flip-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-        .flip-card:hover .flip-card-inner {
-            transform: rotateY(180deg);
-        }
-        .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            border-radius: 8px;
-        }
-        .flip-card-back {
-            transform: rotateY(180deg);
-            background-color: #0da5fd;
-        }
+        .flip-card { background-color: transparent; width: 100%; height: 120px; perspective: 1000px; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 8px; }
+        .flip-card-back { transform: rotateY(180deg); background-color: #0da5fd; }
     </style>
     <meta charset="UTF-8">
     <title>Hungarian University GPA Dashboard</title>
@@ -73,89 +47,53 @@
     </div>
 
     <div class="row">
-        
         <div class="col-md-5">
-            
             <div class="card p-4 shadow-sm mb-4">
                 <h5>Add New Course</h5>
                 <form action="/add-course" method="POST">
                     <div class="mb-3">
-                        <label class="form-label text-muted small">Format: [Name] [Credit] [Grade] [Term]</label>
                         <input type="text" name="raw_input" class="form-control" placeholder="e.g. Calculus 5 4 1" required>
                     </div>
                     <button type="submit" class="btn btn-success w-100 fw-bold">Submit to System</button>
                 </form>
             </div>
 
-            <div class="card p-4 shadow-sm mb-4 border-info">
-                <h5 class="text-info mb-3">🔗 Quick Reference Links</h5>
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="https://neptun.elte.hu" target="_blank" class="btn btn-sm btn-outline-info text-start">
-                        <strong>🦉 Neptun</strong>
-                    </a>
-                    <a href="https://neptun.elte.hu" target="_blank" class="btn btn-sm btn-outline-light text-start">
-                        <strong>📚 Canvas / Moodle</strong>
-                    </a>
-                </div>
-            </div>
-
             <div class="card p-4 shadow-sm" style="max-height: 400px; overflow-y: auto;">
                 <h5>Course History Record</h5>
                 <ul class="list-group mt-2">
                     {% for course in courses %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{{ course.courseName }}</strong>
-                            <div class="text-muted small">Term ID: {{ course.termID }} | Credits: {{ course.credit }}</div>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary rounded-pill fs-6">Grade: {{ course.score }}</span>
-                            
-                            <form action="/delete-course/{{ course.courseName }}" method="post" class="m-0 p-0">
-                                <button type="submit" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; padding: 0; line-height: 1;" title="Delete Course">
-                                    <strong class="fs-5">&times;</strong>
-                                </button>
+                    <li class="list-group-item d-flex flex-column gap-2">
+                        <div class="d-flex justify-content-between align-items-center w-100">
+                            <div>
+                                <strong>{{ course.courseName }}</strong>
+                                <div class="text-muted small">Term: {{ course.termID }}</div>
+                            </div>
+                            <form action="/delete-course/{{ course.courseName }}" method="post" class="m-0">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
                             </form>
                         </div>
+                        
+                        <form action="/edit-course" method="post" class="d-flex gap-1 align-items-center">
+                            <input type="hidden" name="course_name" value="{{ course.courseName }}">
+                            <input type="number" name="new_credit" class="form-control form-control-sm" style="width: 60px;" value="{{ course.credit }}" placeholder="Cr" required>
+                            <input type="number" name="new_score" class="form-control form-control-sm" style="width: 60px;" value="{{ course.score }}" placeholder="Gr" required>
+                            <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                        </form>
                     </li>
                     {% endfor %}
-                    
-                    {% if not courses %}
-                    <div class="text-center text-muted mt-3 mb-2">
-                        <small>No courses added yet. Start typing above!</small>
-                    </div>
-                    {% endif %}
                 </ul>
             </div>
         </div>
 
         <div class="col-md-7">
             <div class="card p-4 shadow-sm h-100 border-0">
-                
-                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <h5 class="m-0">Visual Performance Analytics</h5>
-                    
-                    <div class="btn-group shadow-sm">
-                        <a href="/visualize/gpa" target="vizFrame" class="btn btn-sm btn-outline-info">📈 GPA Trend</a>
-                        <a href="/visualize/credits" target="vizFrame" class="btn btn-sm btn-outline-info">📊 Credit Treemap</a>
-                        <a href="/visualize/term/1" target="vizFrame" class="btn btn-sm btn-outline-info">📝 Term 1 Details</a>
-                        <a href="/visualize/term/2" target="vizFrame" class="btn btn-sm btn-outline-info">📝 Term 2 Details</a>
-                    </div>
-                </div>
-
+                <h5 class="mb-3">Visual Performance Analytics</h5>
                 <iframe name="vizFrame" src="/visualize/gpa" width="100%" height="450px" style="border:none; border-radius: 8px;"></iframe>
             </div>
         </div>
-
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-</script>
 </body>
 </html>

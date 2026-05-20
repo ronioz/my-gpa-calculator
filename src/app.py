@@ -25,7 +25,7 @@ templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
 
 # Initialize the storage manager and load existing data
 my_courses = Courses()
-storage = CourseStorage("courses.db")
+storage = CourseStorage()
 
 # Load the dictionary of courses from storage, and attach it to the Courses object
 my_courses.courses = storage.load()
@@ -44,6 +44,7 @@ class CourseInput(BaseModel):
 @app.get("/dashboard", response_class=HTMLResponse, tags=["Dashboard"])
 def view_dashboard(request: Request):
     """Renders the main HTML dashboard."""
+    my_courses.courses = storage.load()
     total_score, total_credits = my_courses.calculateTotal()
     cumulative_gpa = my_courses.calculateGPA()
 
@@ -92,6 +93,21 @@ async def delete_course(course_name: str):
         # 2. Reload into memory immediately
         my_courses.courses = storage.load()
             
+    return RedirectResponse(url="/dashboard", status_code=303)
+
+@app.post("/edit-course")
+async def edit_course(
+    course_name: str = Form(...), 
+    new_credit: int = Form(...), 
+    new_score: int = Form(...)
+):
+    storage = CourseStorage()
+    courses = storage.load()
+    if course_name in courses:
+        courses[course_name].changeCredit(new_credit)
+        courses[course_name].changeScore(new_score)
+        storage.save(courses)
+
     return RedirectResponse(url="/dashboard", status_code=303)
 
 @app.post("/edit/{course_name}")

@@ -1,4 +1,6 @@
-courses.db
 __pycache__/
 .env
 .venv/
+
+launch.sh
+courses.json
