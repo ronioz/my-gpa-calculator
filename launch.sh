@@ -1,20 +1,19 @@
 #!/bin/zsh
 
-# Function to kill the server when the script exits
+# Define paths
+PROJECT_DIR="/Users/roniosipov/Documents/python/my-gpa-portal"
+VENV_PYTHON="$PROJECT_DIR/.venv/bin/python"
+
+cd "$PROJECT_DIR"
+
+# Cleanup function to ensure no zombie processes
 cleanup() {
-    echo "Shutting down..."
-    kill $SERVER_PID
+    pkill -f "uvicorn"
     exit
 }
 
-# Trap the exit signal (when you close the window)
-trap cleanup EXIT
+# Trap exit signals
+trap cleanup EXIT SIGINT SIGTERM
 
-cd /Users/roniosipov/Documents/python/my-gpa-portal
-
-# Launch the server in the background and capture its PID
-/Users/roniosipov/Documents/python/my-gpa-portal/.venv/bin/python -m uvicorn src.app:app --host 127.0.0.1 --port 8000 &
-SERVER_PID=$!
-
-# Wait forever so the script doesn't exit
-wait $SERVER_PID
+# Launch
+"$VENV_PYTHON" -m uvicorn src.app:app --host 127.0.0.1 --port 8000

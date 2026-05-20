@@ -88,8 +88,16 @@
                         </div>
                         <form action="/edit-course" method="post" class="d-flex gap-2">
                             <input type="hidden" name="course_name" value="{{ course.courseName }}">
-                            <input type="number" name="new_credit" class="form-control form-control-sm" value="{{ course.credit }}" style="width: 60px; background: #000; border-color: #404040; color: #fff;">
-                            <input type="number" name="new_score" class="form-control form-control-sm" value="{{ course.score }}" style="width: 60px; background: #000; border-color: #404040; color: #fff;">
+                            
+                            <input type="number" name="new_credit" class="form-control form-control-sm" 
+                                value="{{ course.credit }}" style="width: 50px;" placeholder="Cr" required>
+                            
+                            <input type="number" name="new_score" class="form-control form-control-sm" 
+                                value="{{ course.score }}" style="width: 50px;" placeholder="Gr" required>
+                                
+                            <input type="number" name="new_term" class="form-control form-control-sm" 
+                                value="{{ course.termID }}" style="width: 50px;" placeholder="Tm" required>
+                                
                             <button type="submit" class="btn btn-sm btn-primary">Save</button>
                         </form>
                     </li>

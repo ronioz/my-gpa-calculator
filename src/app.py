@@ -94,21 +94,22 @@ async def edit_course(
 
     return RedirectResponse(url="/dashboard", status_code=303)
 
-@app.post("/edit/{course_name}")
-async def edit_course(course_name: str, new_credit: int, new_score: int, new_term: int):
-    courses_dict = storage.load() 
-    
-    if course_name in courses_dict:
-        course = courses_dict[course_name]
+@app.post("/edit-course")
+async def edit_course(
+    course_name: str = Form(...), 
+    new_credit: int = Form(...), 
+    new_score: int = Form(...),
+    new_term: int = Form(...)
+):
+    storage = CourseStorage()
+    courses = storage.load()
+    if course_name in courses:
+        courses[course_name].changeCredit(new_credit)
+        courses[course_name].changeScore(new_score)
+        courses[course_name].termID = new_term 
+        storage.save(courses)
         
-        course.changeTerm(new_term)
-        course.changeCredit(new_credit)
-        course.changeScore(new_score)
-        
-        storage.save(courses_dict)
-        return {"status": "success"}
-    
-    return {"status": "error", "message": "Course not found"}
+    return RedirectResponse(url="/dashboard", status_code=303)
 
 @app.get("/", tags=["General"])
 def read_root():

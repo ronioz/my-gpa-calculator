@@ -4,7 +4,7 @@ from src.storage import CourseStorage
 
 def main():
     my_courses = Courses()
-    storage = CourseStorage("courses.json")
+    storage = CourseStorage()
     
     my_courses.courses = storage.load()
     
