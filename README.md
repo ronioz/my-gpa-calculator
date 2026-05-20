@@ -15,24 +15,19 @@ A comprehensive GPA management tool designed for the Hungarian higher education 
 * **Responsive UI:** A dark-mode dashboard built with Bootstrap and custom CSS for a sleek, "terminal-inspired" aesthetic.
 
 ## 🛠 Tech Stack
-
-* 
 **Backend:** [FastAPI](https://fastapi.tiangolo.com/) 
 
 
-* 
 **Frontend Templating:** [Jinja2](https://jinja.palletsprojects.com/) 
 
 
-* 
 **Data Visualization:** [Plotly](https://plotly.com/) 
 
 
-* 
 **Data Handling:** Pandas and Pydantic 
 
 
-* **Serialization:** JSON-based persistence
+**Serialization:** JSON-based persistence
 
 ## 📦 Installation
 
