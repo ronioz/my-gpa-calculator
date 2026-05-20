@@ -1,7 +1,3 @@
-Based on the files provided, here is a professional `README.md` for your Hungarian University GPA project.
-
----
-
 # Hungarian University GPA Portal
 
 A comprehensive GPA management tool designed for the Hungarian higher education grading system (1–5 scale). This project combines a FastAPI backend with an interactive dashboard to help students track their academic progress, visualize grade distributions, and calculate weighted cumulative GPAs.
