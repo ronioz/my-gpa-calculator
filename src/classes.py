@@ -27,7 +27,7 @@ class Course:
         self.score = newScore
 
     def changeTermID(self, newTerm: int) -> None:
-        if not 1 <= newTerm <= 6:
+        if not (1 <= newTerm <= 6):
             print("Enter valid term")
             return
         
@@ -54,8 +54,8 @@ class Courses:
 
     def addCourse(self, course: Course) -> None:
         if course.courseName in self.courses:
-            print(f"⚠ Course '{course.courseName}' already exists!")
             return
+        
         self.courses[course.courseName] = course
         print(f"Added {course.courseName} successfully.")
 

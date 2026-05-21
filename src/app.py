@@ -83,26 +83,12 @@ async def delete_course(course_name: str):
 async def edit_course(
     course_name: str = Form(...), 
     new_credit: int = Form(...), 
-    new_score: int = Form(...)
-):
-    storage = CourseStorage()
-    courses = storage.load()
-    if course_name in courses:
-        courses[course_name].changeCredit(new_credit)
-        courses[course_name].changeScore(new_score)
-        storage.save(courses)
-
-    return RedirectResponse(url="/dashboard", status_code=303)
-
-@app.post("/edit-course")
-async def edit_course(
-    course_name: str = Form(...), 
-    new_credit: int = Form(...), 
     new_score: int = Form(...),
     new_term: int = Form(...)
 ):
     storage = CourseStorage()
     courses = storage.load()
+
     if course_name in courses:
         courses[course_name].changeCredit(new_credit)
         courses[course_name].changeScore(new_score)
