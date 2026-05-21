@@ -26,8 +26,8 @@ class Course:
          
         self.score = newScore
 
-    def changeTerm(self, newTerm: int) -> None:
-        if not 1<= newTerm <= 6:
+    def changeTermID(self, newTerm: int) -> None:
+        if not 1 <= newTerm <= 6:
             print("Enter valid term")
             return
         

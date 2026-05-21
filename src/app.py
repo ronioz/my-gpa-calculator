@@ -106,7 +106,7 @@ async def edit_course(
     if course_name in courses:
         courses[course_name].changeCredit(new_credit)
         courses[course_name].changeScore(new_score)
-        courses[course_name].termID = new_term 
+        courses[course_name].changeTermID(new_term) 
         storage.save(courses)
         
     return RedirectResponse(url="/dashboard", status_code=303)
