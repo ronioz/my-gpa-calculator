@@ -70,39 +70,41 @@
             <div class="card p-4 mb-4">
                 <h5 class="mb-3" style="color: #ffffff;">Add New Course</h5>
                 <form action="/add-course" method="POST">
-                    <input type="text" name="raw_input" class="form-control mb-3" placeholder="[Name with spaces] [Credit] [Grade] [Term]" style="background: #000; border-color: #404040; color: #fff;" required>
+                    <input type="text" name="raw_input" class="form-control mb-3" placeholder="[Credit name] [Credit] [Score] [Term]" style="background: #000; border-color: #404040; color: #fff;" required>
                     <button type="submit" class="btn btn-success w-100">Submit</button>
                 </form>
             </div>
 
             <div class="card p-4" style="max-height: 400px; overflow-y: auto;">
                 <h5 class="mb-3" style="color: #ffffff;">Course History</h5>
-                <ul class="list-group">
-                    {% for course in courses %}
-                    <li class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <strong style="color: #ffffff;">{{ course.courseName }}</strong>
-                            <form action="/delete-course/{{ course.courseName }}" method="post" class="m-0">
-                                <button type="submit" class="btn btn-sm" style="color: #555;">&times;</button>
-                            </form>
-                        </div>
-                        <form action="/edit-course" method="post" class="d-flex gap-2">
-                            <input type="hidden" name="course_name" value="{{ course.courseName }}">
+                
+                <form action="/update-all-courses" method="post">
+                    <ul class="list-group mb-3">
+                        {% for course in courses %}
+                        <li class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong style="color: #ffffff;">{{ course.courseName }}</strong>
+                                <button type="submit" formaction="/delete-course/{{ course.courseName }}" class="btn btn-sm" style="color: #555;">&times;</button>
+                            </div>
                             
-                            <input type="number" name="new_credit" class="form-control form-control-sm" 
-                                value="{{ course.credit }}" style="width: 50px;" placeholder="Cr" required>
-                            
-                            <input type="number" name="new_score" class="form-control form-control-sm" 
-                                value="{{ course.score }}" style="width: 50px;" placeholder="Gr" required>
+                            <div class="d-flex gap-2">
+                                <input type="hidden" name="course_names" value="{{ course.courseName }}">
                                 
-                            <input type="number" name="new_term" class="form-control form-control-sm" 
-                                value="{{ course.termID }}" style="width: 50px;" placeholder="Tm" required>
+                                <input type="number" name="credits" class="form-control form-control-sm" 
+                                    value="{{ course.credit }}" style="width: 50px; background: #000; border-color: #404040; color: #fff;" placeholder="Cr" required>
                                 
-                            <button type="submit" class="btn btn-sm btn-primary">Save</button>
-                        </form>
-                    </li>
-                    {% endfor %}
-                </ul>
+                                <input type="number" name="scores" class="form-control form-control-sm" 
+                                    value="{{ course.score }}" style="width: 50px; background: #000; border-color: #404040; color: #fff;" placeholder="Gr" required>
+                                    
+                                <input type="number" name="terms" class="form-control form-control-sm" 
+                                    value="{{ course.termID }}" style="width: 50px; background: #000; border-color: #404040; color: #fff;" placeholder="Tm" required>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">💾 Save All Changes</button>
+                </form>
             </div>
         </div>
 

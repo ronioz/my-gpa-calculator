@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 
 from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -79,22 +80,24 @@ async def delete_course(course_name: str):
             
     return RedirectResponse(url="/dashboard", status_code=303)
 
-@app.post("/edit-course")
-async def edit_course(
-    course_name: str = Form(...), 
-    new_credit: int = Form(...), 
-    new_score: int = Form(...),
-    new_term: int = Form(...)
+@app.post("/update-all-courses")
+async def update_all_courses(
+    course_names: List[str] = Form(default=[]), 
+    credits: List[int] = Form(default=[]), 
+    scores: List[int] = Form(default=[]),
+    terms: List[int] = Form(default=[])
 ):
-    storage = CourseStorage()
     courses = storage.load()
-
-    if course_name in courses:
-        courses[course_name].changeCredit(new_credit)
-        courses[course_name].changeScore(new_score)
-        courses[course_name].changeTermID(new_term) 
-        storage.save(courses)
-        
+    
+    for idx, name in enumerate(course_names):
+        if name in courses:
+            courses[name].changeCredit(credits[idx])
+            courses[name].changeScore(scores[idx])
+            courses[name].changeTermID(terms[idx])
+            
+    storage.save(courses)
+    my_courses.courses = storage.load()
+    
     return RedirectResponse(url="/dashboard", status_code=303)
 
 @app.get("/", tags=["General"])
